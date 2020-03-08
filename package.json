@@ -1,0 +1,13 @@
+{
+  "name": "wordCloud",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "elm-live -p 8005  src/Example1.elm"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
