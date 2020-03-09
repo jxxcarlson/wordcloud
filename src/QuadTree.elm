@@ -1,4 +1,4 @@
-module QuadTree exposing (QuadTree(..), qb1, qt1, qt2, qt3, subdivide)
+module QuadTree exposing (QuadTree(..), boxIsFull, qb1, qt1, qt2, qt3, subdivide)
 
 
 type QuadTree a
@@ -35,33 +35,64 @@ type alias Data a =
     { bb : BoundingBox, content : Content a }
 
 
-subdivide : (Data a -> Bool) -> QuadTree (Data a) -> QuadTree (Data a)
+subdivide : (Data ( Float, Float ) -> Bool) -> QuadTree (Data ( Float, Float )) -> QuadTree (Data ( Float, Float ))
 subdivide f qt =
     case qt of
-        Leaf { bb, content } ->
-            let
-                x =
-                    bb.x
+        Leaf leaf ->
+            case boxIsFull leaf of
+                False ->
+                    Leaf leaf
 
-                y =
-                    bb.y
+                True ->
+                    let
+                        x =
+                            leaf.bb.x
 
-                w2 =
-                    bb.w / 2
+                        y =
+                            leaf.bb.y
 
-                h2 =
-                    bb.h / 2
-            in
-            Node
-                [ Leaf { bb = BoundingBox x y w2 h2, content = Empty }
-                , Leaf { bb = BoundingBox x (y + h2) w2 h2, content = Empty }
-                , Leaf { bb = BoundingBox (x + w2) (y + h2) w2 h2, content = Empty }
-                , Leaf { bb = BoundingBox (x + w2) y w2 h2, content = Empty }
-                ]
+                        w2 =
+                            leaf.bb.w / 2
+
+                        h2 =
+                            leaf.bb.h / 2
+
+                        children =
+                            [ { bb = BoundingBox x y w2 h2, content = leaf.content }
+                            , { bb = BoundingBox x (y + h2) w2 h2, content = leaf.content }
+                            , { bb = BoundingBox (x + w2) (y + h2) w2 h2, content = leaf.content }
+                            , { bb = BoundingBox (x + w2) y w2 h2, content = leaf.content }
+                            ]
+
+                        continue : Data ( Float, Float ) -> QuadTree (Data ( Float, Float ))
+                        continue ({ bb, content } as datum) =
+                            case boxIsFull datum of
+                                True ->
+                                    Leaf datum
+
+                                False ->
+                                    Leaf { bb = bb, content = Empty }
+                    in
+                    Node (List.map continue children)
 
         Node children ->
             Node (List.map (subdivide f) children)
 
 
 qb1 =
-    Leaf { bb = BoundingBox 0 0 256 256, content = Empty }
+    Leaf { bb = BoundingBox 0 0 256 256, content = Filled ( 4, 4 ) }
+
+
+pointInBox : ( Float, Float ) -> BoundingBox -> Bool
+pointInBox ( px, py ) { x, y, w, h } =
+    x <= px && px <= x + w && y <= py && py <= y + h
+
+
+boxIsFull : Data ( Float, Float ) -> Bool
+boxIsFull { bb, content } =
+    case content of
+        Empty ->
+            False
+
+        Filled point ->
+            pointInBox point bb
