@@ -1,4 +1,4 @@
-module Word exposing (Word, init, render)
+module Word exposing (Word, boundingBox, init, render)
 
 import Svg exposing (..)
 import Svg.Attributes exposing (..)
@@ -25,26 +25,49 @@ init str =
     }
 
 
-rgb : List Float -> String
-rgb colors =
+type alias BoundingBox =
+    { x : Float
+    , y : Float
+    , w : Float
+    , h : Float
+    }
+
+
+boundingBox : Word -> BoundingBox
+boundingBox w =
     let
-        colorString =
-            colors
-                |> List.take 3
-                |> List.map (\x -> 255 * x)
-                |> List.map String.fromFloat
-                |> String.join ", "
+        width =
+            12 * w.scale * (String.length w.text |> toFloat)
+
+        height =
+            11 * w.scale
     in
-    "rgb(" ++ colorString ++ ")"
+    BoundingBox w.x w.y width height
 
 
-opacity : List Float -> String
-opacity colors =
-    colors
-        |> List.reverse
-        |> List.head
-        |> Maybe.withDefault 1.0
-        |> (\x -> String.fromFloat (100 * x) ++ "%")
+alphabet =
+    String.toList "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+
+
+isUpperCase : Char -> Bool
+isUpperCase c =
+    List.member c alphabet
+
+
+stringWidth : String -> Float
+stringWidth str =
+    let
+        nUpper =
+            str
+                |> String.toList
+                |> List.filter isUpperCase
+                |> List.length
+                |> toFloat
+
+        nLower =
+            (String.length str |> toFloat) - nUpper
+    in
+    11.6 * nUpper + 5.1 * nLower
 
 
 render : Word -> Svg msg
@@ -67,7 +90,7 @@ render w =
             h
 
         w_ =
-            12 * (String.length w.text |> toFloat)
+            stringWidth w.text
 
         color =
             rgb w.color
@@ -79,3 +102,25 @@ render w =
     , text_ [ transform sc, fill color, x "0", y (String.fromFloat h) ] [ text w.text ]
     ]
         |> g [ transform tra ]
+
+
+rgb : List Float -> String
+rgb colors =
+    let
+        colorString =
+            colors
+                |> List.take 3
+                |> List.map (\x -> 255 * x)
+                |> List.map String.fromFloat
+                |> String.join ", "
+    in
+    "rgb(" ++ colorString ++ ")"
+
+
+opacity : List Float -> String
+opacity colors =
+    colors
+        |> List.reverse
+        |> List.head
+        |> Maybe.withDefault 1.0
+        |> (\x -> String.fromFloat (100 * x) ++ "%")

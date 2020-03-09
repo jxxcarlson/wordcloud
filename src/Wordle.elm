@@ -1,4 +1,4 @@
-module Wordle exposing (render, sort, tdata, tdata2)
+module Wordle exposing (render, sort, tdata, tdata2, wordList)
 
 import Random
 import Svg exposing (..)
@@ -37,14 +37,13 @@ loop st f =
             loop (f st_) f
 
 
-render : Float -> Float -> Float -> List ( String, Float ) -> Svg msg
-render x_ y_ scale data =
+wordList : Float -> Float -> Float -> List ( String, Float ) -> List Word
+wordList x_ y_ scale data =
     let
         data_ =
             sort data
 
-        renderWord : Int -> String -> Float -> Svg msg
-        renderWord i w p =
+        makeWord i w p =
             let
                 x =
                     20
@@ -55,7 +54,37 @@ render x_ y_ scale data =
                 color =
                     [ 0.8, 0, 0, 1 ]
             in
-            Word.render (Word w x y (scale * p) 0 color)
+            Word w x y (scale * p) 0 color
     in
-    List.indexedMap (\i ( w, p ) -> renderWord i w p) data_
+    List.indexedMap (\i ( w, p ) -> makeWord i w p) data_
+
+
+render : Float -> Float -> List Word -> Svg msg
+render x_ y_ wl =
+    List.map Word.render wl
         |> g [ x (String.fromFloat x_), y (String.fromFloat y_) ]
+
+
+
+--render : Float -> Float -> Float -> List ( String, Float ) -> Svg msg
+--render x_ y_ scale data =
+--    let
+--        data_ =
+--            sort data
+--
+--        renderWord : Int -> String -> Float -> Svg msg
+--        renderWord i w p =
+--            let
+--                x =
+--                    20
+--
+--                y =
+--                    20 + (30.0 * toFloat i)
+--
+--                color =
+--                    [ 0.8, 0, 0, 1 ]
+--            in
+--            Word.render (Word w x y (scale * p) 0 color)
+--    in
+--    List.indexedMap (\i ( w, p ) -> renderWord i w p) data_
+--        |> g [ x (String.fromFloat x_), y (String.fromFloat y_) ]
