@@ -50,16 +50,12 @@ render x_ y_ scale data =
                     20
 
                 y =
-                    20 + (20.0 * toFloat i)
+                    20 + (30.0 * toFloat i)
 
                 color =
-                    if modBy 2 i == 0 then
-                        "#A00"
-
-                    else
-                        "#00A"
+                    [ 0.8, 0, 0, 1 ]
             in
-            Word.render (Word w x y 0 (scale * p) color 1)
+            Word.render (Word w x y (scale * p) 0 color)
     in
     List.indexedMap (\i ( w, p ) -> renderWord i w p) data_
         |> g [ x (String.fromFloat x_), y (String.fromFloat y_) ]

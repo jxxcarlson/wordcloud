@@ -10,8 +10,7 @@ type alias Word =
     , y : Float
     , scale : Float
     , angle : Float
-    , color : String
-    , opacity : Float
+    , color : List Float
     }
 
 
@@ -22,16 +21,37 @@ init str =
     , y = 0
     , scale = 1
     , angle = 0
-    , color = "#000"
-    , opacity = 1
+    , color = [ 0.9, 0.9, 1.0, 1.0 ]
     }
+
+
+rgb : List Float -> String
+rgb colors =
+    let
+        colorString =
+            colors
+                |> List.take 3
+                |> List.map (\x -> 255 * x)
+                |> List.map String.fromFloat
+                |> String.join ", "
+    in
+    "rgb(" ++ colorString ++ ")"
+
+
+opacity : List Float -> String
+opacity colors =
+    colors
+        |> List.reverse
+        |> List.head
+        |> Maybe.withDefault 1.0
+        |> (\x -> String.fromFloat (100 * x) ++ "%")
 
 
 render : Word -> Svg msg
 render w =
     let
         sc =
-            "scale(" ++ String.fromFloat w.scale ++ ", " ++ String.fromFloat w.scale ++ ")" |> Debug.log "SCALE"
+            "scale(" ++ String.fromFloat w.scale ++ ", " ++ String.fromFloat w.scale ++ ")"
 
         rot =
             --"rotate(" ++ String.fromFloat angle ++ " " ++ String.fromFloat x_ ++ " " ++ String.fromFloat y_ ++ ")"
@@ -48,8 +68,14 @@ render w =
 
         w_ =
             12 * (String.length w.text |> toFloat)
+
+        color =
+            rgb w.color
+
+        opacity_ =
+            opacity w.color
     in
     [ rect [ transform sc, x "0", y "0", fillOpacity "20%", width (String.fromFloat w_), height (String.fromFloat h), fill "#99F" ] []
-    , text_ [ transform sc, fill w.color, x "0", y (String.fromFloat h) ] [ text w.text ]
+    , text_ [ transform sc, fill color, x "0", y (String.fromFloat h) ] [ text w.text ]
     ]
         |> g [ transform tra ]
