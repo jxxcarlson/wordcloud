@@ -31,7 +31,7 @@ render : Word -> Svg msg
 render w =
     let
         sc =
-            "scale(" ++ String.fromFloat w.scale ++ ", " ++ String.fromFloat w.scale ++ ")"
+            "scale(" ++ String.fromFloat w.scale ++ ", " ++ String.fromFloat w.scale ++ ")" |> Debug.log "SCALE"
 
         rot =
             --"rotate(" ++ String.fromFloat angle ++ " " ++ String.fromFloat x_ ++ " " ++ String.fromFloat y_ ++ ")"

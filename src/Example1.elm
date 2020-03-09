@@ -17,9 +17,9 @@ main =
         , y "0"
         , viewBox "0 0 300 300"
         ]
-        [ Word.render (Word "AAAA" 40 40 0 1.5 "#800" 1)
-        , Word.render (Word "BBBB" 40 60 0 1.0 "#800" 1)
-        , Word.render (Word "CCCC" 40 80 0 0.5 "#800" 1)
+        [ Word.render (Word "AAAA" 40 40 1.5 0 "#800" 1)
+        , Word.render (Word "BBBB" 40 60 1.0 0 "#800" 1)
+        , Word.render (Word "CCCC" 40 80 0.5 0 "#800" 1)
         ]
 
 
