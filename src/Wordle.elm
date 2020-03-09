@@ -1,8 +1,9 @@
-module Wordle exposing (render, sort, tdata, tdata2, word)
+module Wordle exposing (render, sort, tdata, tdata2)
 
 import Random
 import Svg exposing (..)
 import Svg.Attributes exposing (..)
+import Word exposing (Word)
 
 
 tdata : List ( String, Float )
@@ -58,60 +59,7 @@ render x_ y_ scale data =
                     else
                         "#00A"
             in
-            word x y 0 (scale * p) w color
+            Word.render (Word w x y 0 (scale * p) color 1)
     in
     List.indexedMap (\i ( w, p ) -> renderWord i w p) data_
         |> g [ x (String.fromFloat x_), y (String.fromFloat y_) ]
-
-
-word : Float -> Float -> Float -> Float -> String -> String -> Svg msg
-word x_ y_ angle scale str textColor =
-    let
-        sc =
-            "scale(" ++ String.fromFloat scale ++ ", " ++ String.fromFloat scale ++ ")"
-
-        rot =
-            --"rotate(" ++ String.fromFloat angle ++ " " ++ String.fromFloat x_ ++ " " ++ String.fromFloat y_ ++ ")"
-            "rotate(" ++ String.fromFloat angle ++ " 0 0)"
-
-        tra =
-            "translate(" ++ String.fromFloat x_ ++ ", " ++ String.fromFloat y_ ++ ")"
-
-        h =
-            11
-
-        hh =
-            h
-
-        w =
-            12 * (String.length str |> toFloat)
-    in
-    [ rect [ transform sc, x "0", y "0", fillOpacity "20%", width (String.fromFloat w), height (String.fromFloat h), fill "#99F" ] []
-    , text_ [ transform sc, fill textColor, x "0", y (String.fromFloat h) ] [ text str ]
-    ]
-        |> g [ transform tra ]
-
-
-
---
---box : Float -> Float -> Float -> Float -> String -> String -> String -> Svg msg
---box x_ y_ w h str color textColor =
---    let
---        xx =
---            x_ + 5
---
---        yy =
---            y_ + h / 2 + 4
---    in
---    g [ transform "scale 0.25 0.25" ]
---        [ rect
---            [ fill color
---            , x (String.fromFloat x_)
---            , y (String.fromFloat y_)
---            , width (String.fromFloat w)
---            , height (String.fromFloat h)
---            ]
---            []
---        , text_ [ fill textColor, x (String.fromFloat xx), y (String.fromFloat yy) ] [ text str ]
---        ]
---
